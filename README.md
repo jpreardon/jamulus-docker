@@ -1,5 +1,8 @@
 # Jamulus 🎶
-[Docker](https://hub.docker.com/repository/docker/grundic/jamulus) configuration for [Jamulus](https://github.com/jamulussoftware/jamulus) music server.
+
+Note: This is a fork of [jamulus-docker](https://github.com/grundic/jamulus-docker). The only differences are the updated Alpine version and the usage examples below point at my docker image, which uses the dockerfile in this repo that is updated to use the latest version of Jamulus.
+
+[Docker](https://hub.docker.com/repository/docker/grundic/jamulus) configuration for [Jamulus](https://github.com/jamulussoftware/jamulus) music server. 
 
 The Jamulus software enables musicians to perform real-time jam sessions over the internet. There is one server running the Jamulus server software which collects the audio data from each Jamulus client, mixes the audio data and sends the mix back to each client.
 
@@ -11,12 +14,12 @@ Here are some example snippets to help you get started creating a container.
 
 ```bash
 docker run \
-  -e TZ=America/Los_Angeles \
+  -e TZ=America/New_York \
   --name jamulus \
   -d --rm \
   -p 22124:22124/udp \
   -v $(pwd)/jam:/jam \
-  grundic/jamulus \
+  jpreardon/jamulus \
   -n -s -p 22124 -l /jam/jamulus.log -w "Welcome to Jamulus docker server."
 ```
 
@@ -28,18 +31,18 @@ version: "3.7"
 services:
   jamulus:
     container_name: jamulus 
-    image: grundic/jamulus
+    image: jpreardon/jamulus
     restart: always
     ports:
       - "22124:22124/udp"
     environment:
-      TZ: "America/Los_Angeles"  
+      TZ: "America/New_York"  
     entrypoint:
       - "Jamulus"
       - "--server"
       - "--nogui"
       - "--welcomemessage"
-      - "Welcome to the Jamulus rehearsal room"
+      - "Welcome to Jamulus docker server"
       - "--numchannels"
       - "16"
 ```
