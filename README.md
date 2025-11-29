@@ -18,7 +18,6 @@ docker run \
   -p 22124:22124/udp \
   -v $(pwd)/jam:/jam \
   jpreardon/jamulus:latest \
-  --server --nogui \
   -n -s -p 22124 -l /jam/jamulus.log -w "Welcome to Jamulus docker server."
 ```
 
