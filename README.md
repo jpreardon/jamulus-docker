@@ -1,50 +1,25 @@
 # Jamulus 🎶
 
-Note: This is a fork of [jamulus-docker](https://github.com/grundic/jamulus-docker). The only differences are the updated Alpine version and the usage examples below point at my docker image, which uses the dockerfile in this repo that is updated to use the latest version of Jamulus.
-
-[Docker](https://hub.docker.com/repository/docker/grundic/jamulus) configuration for [Jamulus](https://github.com/jamulussoftware/jamulus) music server. 
+Note: This is a fork of [jamulus-docker](https://github.com/grundic/jamulus-docker). This [Docker](https://hub.docker.com/r/jpreardon/jamulus) image uses the precompiled distribution of the latest version of the [Jamulus](https://github.com/jamulussoftware/jamulus) music server (rather than building it from source).
 
 The Jamulus software enables musicians to perform real-time jam sessions over the internet. There is one server running the Jamulus server software which collects the audio data from each Jamulus client, mixes the audio data and sends the mix back to each client.
 
 # Usage
 
-Here are some example snippets to help you get started creating a container.
+Here is an example snippet to help you get started creating a container.
 
-## docker
+## Docker
 
-```bash
+```
 docker run \
   -e TZ=America/New_York \
   --name jamulus \
   -d --rm \
   -p 22124:22124/udp \
   -v $(pwd)/jam:/jam \
-  jpreardon/jamulus \
+  jpreardon/jamulus:latest \
+  --server --nogui \
   -n -s -p 22124 -l /jam/jamulus.log -w "Welcome to Jamulus docker server."
-```
-
-## docker-compose
-
-```yaml
----
-version: "3.7"
-services:
-  jamulus:
-    container_name: jamulus 
-    image: jpreardon/jamulus
-    restart: always
-    ports:
-      - "22124:22124/udp"
-    environment:
-      TZ: "America/New_York"  
-    entrypoint:
-      - "Jamulus"
-      - "--server"
-      - "--nogui"
-      - "--welcomemessage"
-      - "Welcome to Jamulus docker server"
-      - "--numchannels"
-      - "16"
 ```
 
 You can monitor output with `docker logs -f jamulus`
@@ -70,6 +45,7 @@ You can monitor output with `docker logs -f jamulus`
 |-R, --recording |sets directory to contain recorded jams |
 |--norecord |disables recording (when enabled by default by -R) |
 |-p, --port |local port number |
+|-P, --delaypan |Start with delay panning enabled. |
 |-s, --server |start server |
 |-T, --multithreading |use multithreading to make better use of multi-core CPUs and support more clients |
 |-u, --numchannels |maximum number of channels |

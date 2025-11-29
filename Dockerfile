@@ -1,40 +1,23 @@
-FROM alpine:3.22 AS builder
+FROM debian:bookworm-slim
 
+# Install dependencies (curl + apt transport stuff)
+RUN apt-get update && apt-get install -y \
+    curl gpg \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN \
- echo "**** updating system packages ****" && \
- apk update
+# Fetch and run the Jamulus repo setup script
+RUN curl -fsSL https://raw.githubusercontent.com/jamulussoftware/jamulus/main/linux/setup_repo.sh -o /tmp/setup_repo.sh \
+    && chmod +x /tmp/setup_repo.sh \
+    && /tmp/setup_repo.sh \
+    && rm /tmp/setup_repo.sh
 
-RUN \
- echo "**** install build packages ****" && \
-   apk add --no-cache --virtual .build-dependencies \
-        build-base \
-        wget \
-        qt5-qtbase-dev \
-        qt5-qttools-dev \
-        qtchooser
+# Install Jamulus headless only
+RUN apt-get update \
+    && apt-get install -y jamulus-headless \
+    && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /tmp
-RUN \
- echo "**** getting source code ****" && \
-   wget "https://github.com/jamulussoftware/jamulus/archive/latest.tar.gz" && \
-   tar xzf latest.tar.gz
+# Expose Jamulus default server port
+EXPOSE 22124/udp
 
-# Github directory format for tar.gz export
-WORKDIR /tmp/jamulus-latest
-RUN \
- echo "**** compiling source code ****" && \
-   qmake "CONFIG+=nosound headless" Jamulus.pro && \
-   make clean && \
-   make && \
-   cp Jamulus /usr/local/bin/ && \
-   rm -rf /tmp/* && \
-   apk del .build-dependencies
-
-FROM alpine:3.22
-
-RUN apk add --update --no-cache \
-    qt5-qtbase-x11 icu-libs tzdata
-
-COPY --from=builder /usr/local/bin/Jamulus /usr/local/bin/Jamulus
-ENTRYPOINT ["Jamulus"]
+# Run the server
+ENTRYPOINT ["jamulus-headless"]
